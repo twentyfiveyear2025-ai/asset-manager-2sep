@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#e8f0ff;--panel:#ffffff;--soft:#f7fbff;--border:#d8e4f4;--text:#102d5a;--muted:#5f708a;--blue:#2563eb;--blue2:#1d4ed8;--blueSoft:#dbeafe;--green:#15803d;--greenSoft:#dcfce7;--yellow:#b45309;--yellowSoft:#fef3c7;--red:#dc2626;--redSoft:#fee2e2;--shadow:0 20px 55px rgba(15,23,42,.12)}
+body.dark{--bg:#0f172a;--panel:#162033;--soft:#1a2740;--border:#2a3951;--text:#e9eef8;--muted:#94a3b8;--blueSoft:rgba(37,99,235,.2);--greenSoft:rgba(22,163,74,.16);--yellowSoft:rgba(217,119,6,.18);--redSoft:rgba(220,38,38,.18);--shadow:0 22px 60px rgba(2,8,23,.42)}
+body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at top left,rgba(37,99,235,.12),transparent 30%),var(--bg);color:var(--text);min-height:100vh;font-size:14px;transition:background .22s ease,color .22s ease}
+button,input,select,textarea{font:inherit}
+.hidden{display:none!important}
+.btn{border:none;border-radius:14px;padding:11px 16px;min-height:44px;cursor:pointer}
+.btn-primary{background:var(--blue);color:#fff}.btn-secondary{background:var(--soft);color:var(--text);border:1px solid var(--border)}.btn-danger{background:var(--redSoft);color:var(--red)}
+.auth-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:22px;background:linear-gradient(135deg,#edf4ff,#f7fafc,#edf9f0);z-index:100}
+.auth-shell{width:100%;max-width:960px;display:grid;grid-template-columns:1.05fr .95fr;background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.8);border-radius:28px;overflow:hidden;box-shadow:var(--shadow)}
+.auth-hero{padding:46px;background:linear-gradient(155deg,#0f172a,#1d4ed8);color:#eff6ff;display:grid;gap:22px}.auth-brand{display:flex;gap:12px;align-items:center;font-weight:700}.auth-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.12)}
+.auth-hero h1{font-size:clamp(2.1rem,4vw,3.1rem);line-height:.94;letter-spacing:-.05em}.auth-hero p{color:rgba(239,246,255,.78);line-height:1.7}.auth-points{display:grid;gap:10px}.auth-point{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.08);font-size:13px;line-height:1.6}
+.auth-panel{padding:36px;display:flex;align-items:center}.auth-card{width:100%;max-width:380px}.kicker{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}.auth-card h2{font-size:32px;letter-spacing:-.04em;margin-bottom:10px}.sub{color:var(--muted);line-height:1.65;margin-bottom:20px}
+.stack{display:grid;gap:12px}.label{font-size:12px;font-weight:600;letter-spacing:.03em;color:var(--muted);text-transform:uppercase}.input,.textarea,.select{width:100%;padding:13px 14px;border:1px solid var(--border);border-radius:14px;background:var(--panel);color:var(--text);outline:none}.textarea{min-height:110px;resize:vertical}
+.auth-actions{display:grid;gap:12px;margin-top:14px}.status{min-height:18px;font-size:12.5px;color:var(--red)}.status.ok{color:var(--green)}.auth-note{margin-top:16px;padding:12px 14px;border-radius:14px;background:var(--blueSoft);border:1px solid rgba(37,99,235,.14);font-size:12.5px}
+.app{display:none;min-height:100vh}.sidebar{width:220px;position:fixed;inset:0 auto 0 0;padding:18px 14px;border-right:1px solid var(--border);background:rgba(255,255,255,.72);backdrop-filter:blur(14px);display:flex;flex-direction:column;gap:16px}
+.brand{padding:8px 10px 18px;border-bottom:1px solid var(--border)}.brand-row{display:flex;gap:12px;align-items:center;font-weight:700}.brand-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),#3b82f6);color:#fff}.brand p{margin-top:8px;color:var(--muted);line-height:1.5;font-size:12.5px}
+.nav{display:grid;gap:8px}.nav b{padding:0 10px;color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase}.nav button{display:flex;gap:12px;align-items:center;width:100%;padding:12px 14px;border-radius:16px;border:1px solid transparent;background:transparent;color:var(--muted);text-align:left}.nav button.active{background:var(--blueSoft);color:var(--blue);border-color:rgba(37,99,235,.12)}.nav .ico{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:var(--soft)}.side-note{margin-top:auto;padding:14px 10px 0;border-top:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6}
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column}.top{position:sticky;top:0;z-index:30;display:flex;justify-content:space-between;gap:14px;align-items:center;padding:16px 22px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.68);backdrop-filter:blur(14px)}.copy h1{font-size:22px;letter-spacing:-.04em;margin-bottom:3px}.copy p{color:var(--muted)}.top-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.search{display:flex;gap:10px;align-items:center;min-width:min(300px,100%);padding:10px 12px;border-radius:14px;background:var(--soft);border:1px solid var(--border)}.search input{width:100%;border:none;background:transparent;outline:none;color:var(--text)}.chip{display:flex;gap:10px;align-items:center;padding:9px 11px;border-radius:14px;background:var(--soft);border:1px solid var(--border)}.avatar{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--blue),#3b82f6);color:#fff;font-weight:700;font-size:12px}.chip small{display:block;color:var(--muted)}
+.content{padding:22px;display:grid;gap:18px}.tab{display:none;gap:18px}.tab.active{display:grid}.card{background:var(--panel);border:1px solid var(--border);border-radius:22px;padding:18px;box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.head h2{font-size:18px;letter-spacing:-.04em}.head p{color:var(--muted);margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.stat{background:var(--soft);border:1px solid var(--border);border-radius:18px;padding:16px}.stat span{display:block;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}.stat strong{font-size:26px;letter-spacing:-.05em}.stat.clickable{cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease}.stat.clickable:hover{transform:translateY(-1px);box-shadow:0 12px 26px rgba(15,23,42,.08)}.stat.clickable.active{border-color:rgba(37,99,235,.24);background:rgba(37,99,235,.08)}.asset-summary-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:18px 22px;border-radius:24px;background:linear-gradient(145deg,rgba(37,99,235,.16),rgba(255,255,255,.95));border:1px solid rgba(37,99,235,.18);box-shadow:0 18px 45px rgba(15,23,42,.09);color:var(--text)}.asset-summary-banner>div:first-child{min-width:240px}.asset-summary-banner .eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--blue);font-weight:700;margin-bottom:6px}.asset-summary-banner h3{font-size:20px;letter-spacing:-.04em;margin:0 0 6px}.asset-summary-banner p{margin:0;color:var(--muted);font-size:13px;max-width:420px}.summary-pill-group{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:flex-end}.pill{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:999px;background:#fff;color:var(--text);font-weight:700;box-shadow:0 10px 24px rgba(15,23,42,.06);min-width:170px}.pill.total-pill{background:#eff6ff;color:var(--blue)}.pill.assigned-pill{background:#dbeafe;color:var(--blue2)}.pill.pending-pill{background:#fef3c7;color:#92400e}.pill.bd-pill{background:#dcfce7;color:#166534}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.asset,.security,.note{background:var(--soft);border:1px solid var(--border);border-radius:20px;padding:16px;display:grid;gap:12px}.pc{min-height:120px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(37,99,235,.15),rgba(37,99,235,.04));border:1px solid rgba(37,99,235,.12);font-size:62px}.pc-wrap{display:grid;justify-items:center;gap:10px}.id{display:inline-flex;width:max-content;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.7);color:var(--blue);font-family:'DM Mono',monospace;font-size:12px}.row{display:flex;justify-content:space-between;gap:10px}.title{font-size:17px;letter-spacing:-.03em}.sub-title{display:block;margin-top:4px;font-size:14px;font-weight:600;color:var(--muted)}.muted{color:var(--muted);line-height:1.5}.badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:600}.blue{background:var(--blueSoft);color:var(--blue2)}.green{background:var(--greenSoft);color:var(--green)}.yellow{background:var(--yellowSoft);color:var(--yellow)}.red{background:var(--redSoft);color:var(--red)}.neutral{background:var(--panel);color:var(--muted);border:1px solid var(--border)}.sticky{background:#fff4b8;border-color:#ebd879;transform:rotate(-1deg)}.sticky:nth-child(even){transform:rotate(1deg)}.empty{padding:24px 16px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:18px;background:var(--soft)}
+.laptop-shell,.security-shell{display:grid;gap:18px}.laptop-hero,.security-hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);gap:14px}.laptop-hero{grid-template-columns:minmax(0,1fr)}.laptop-banner,.security-banner,.security-focus{border-radius:22px;padding:18px;border:1px solid var(--border);background:linear-gradient(140deg,rgba(15,23,42,.97),rgba(29,78,216,.9));color:#eff6ff;box-shadow:var(--shadow)}.laptop-banner{min-height:clamp(220px,32vh,320px);padding:24px 28px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(145deg,#071a3a,#0f3b85,#2563eb)}.laptop-banner p,.security-banner p,.security-focus p,.security-focus .muted-lite{color:rgba(239,246,255,.78)}.laptop-banner .eyebrow,.security-banner .eyebrow,.security-focus .eyebrow,.reports-hero .eyebrow,.report-focus .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(191,219,254,.85);font-weight:700}.laptop-banner h2,.security-banner h2,.security-focus h3,.reports-hero h2{font-size:26px;letter-spacing:-.05em;margin:10px 0 8px}.laptop-banner h2{font-size:clamp(1.9rem,3.4vw,3rem);line-height:.98;max-width:none;white-space:nowrap;margin:12px 0 14px}.laptop-banner p{max-width:640px;font-size:15px;line-height:1.65}.laptop-banner .band,.security-banner .band{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.mini-pill{display:inline-flex;align-items:center;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);font-size:12px}.security-focus{background:linear-gradient(155deg,rgba(21,32,51,.98),rgba(37,99,235,.85));display:grid;gap:12px}.security-focus strong{font-size:18px;letter-spacing:-.04em}.security-focus .stamp{font-family:'DM Mono',monospace;font-size:12px;color:#bfdbfe}.security-toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.filters{display:flex;gap:10px;flex-wrap:wrap}.filter-chip{border:1px solid var(--border);background:var(--soft);color:var(--muted);border-radius:999px;padding:9px 13px;cursor:pointer;transition:all .18s ease}.filter-chip.active{background:var(--blueSoft);color:var(--blue2);border-color:rgba(37,99,235,.18)}.security-list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.laptop-list{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}.security-card,.asset-card{position:relative;overflow:hidden}.security-card:before,.asset-card:before{content:"";position:absolute;left:18px;top:18px;bottom:18px;width:3px;border-radius:999px;background:linear-gradient(180deg,var(--blue),transparent)}.security-card .security-body,.asset-card .asset-body{padding-left:16px}.security-meta,.asset-meta{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.security-detail{font-size:13px;line-height:1.65;color:var(--muted)}.security-footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}.security-kpis .stat strong,.laptop-kpis .stat strong{font-size:24px}.theme-line{display:flex;justify-content:space-between;gap:12px;align-items:center}.theme-state{font-size:12px;color:var(--muted)}
+  .reports-shell{display:grid;gap:18px}.reports-top{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr);gap:14px;align-items:stretch}.reports-hero{border-radius:24px;padding:24px 26px;border:1px solid rgba(37,99,235,.14);background:radial-gradient(circle at top left,rgba(37,99,235,.22),transparent 40%),radial-gradient(circle at bottom right,rgba(34,197,94,.14),transparent 45%),linear-gradient(135deg,#eef2ff,#eff6ff,#ecfeff);box-shadow:var(--shadow);display:flex;flex-direction:column;justify-content:space-between;min-height:clamp(220px,28vh,300px)}.reports-hero p{color:rgba(15,23,42,.72)}.reports-hero .eyebrow{color:rgba(37,99,235,.9)}.reports-band{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.report-focus{background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(255,255,255,.62));border:1px solid var(--border);border-radius:24px;padding:18px;display:grid;gap:12px;box-shadow:var(--shadow)}.report-focus .eyebrow{color:var(--muted)}.report-focus strong{font-size:19px;letter-spacing:-.04em}.report-focus .stamp{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}.report-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}.report-card{position:relative;min-height:255px;padding:22px 18px 18px;border-radius:18px;border:1px solid rgba(148,163,184,.40);box-shadow:0 18px 34px rgba(15,23,42,.10),inset 0 1px 0 rgba(255,255,255,.72);transform:none;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}.report-card:hover{transform:translateY(-3px);border-color:rgba(37,99,235,.32);box-shadow:0 26px 48px rgba(15,23,42,.14),inset 0 1px 0 rgba(255,255,255,.72)}
+  .report-card.paper-sun{background:radial-gradient(circle at 20% 18%,rgba(245,158,11,.26),transparent 55%),linear-gradient(180deg,#ffffff 0%,#fffbeb 100%)}
+  .report-card.paper-peach{background:radial-gradient(circle at 20% 18%,rgba(244,63,94,.18),transparent 55%),linear-gradient(180deg,#ffffff 0%,#fff1f2 100%)}
+  .report-card.paper-mint{background:radial-gradient(circle at 20% 18%,rgba(34,197,94,.20),transparent 55%),linear-gradient(180deg,#ffffff 0%,#ecfdf5 100%)}
+  .report-card.paper-sky{background:radial-gradient(circle at 20% 18%,rgba(59,130,246,.20),transparent 55%),linear-gradient(180deg,#ffffff 0%,#eff6ff 100%)}
+  .report-card:before{content:\"\";position:absolute;inset:0;background:radial-gradient(circle at 18% 18%,rgba(37,99,235,.08),transparent 55%),radial-gradient(circle at 85% 70%,rgba(34,197,94,.06),transparent 55%);pointer-events:none}.report-card:after{content:\"\";position:absolute;right:-36px;bottom:-40px;width:120px;height:120px;background:radial-gradient(circle at 30% 35%,rgba(37,99,235,.12),transparent 60%);transform:rotate(0deg);border-radius:999px;pointer-events:none}.report-card .muted{color:var(--muted)}.report-card .note-body{position:relative;z-index:1;display:grid;gap:14px;height:100%}.report-card .clip,.report-card .pin{display:none}.report-card .title{max-width:calc(100% - 30px);font-size:20px;line-height:1.08;font-weight:700;letter-spacing:-.04em;padding-top:2px}.report-card .note-copy{font-size:14px;line-height:1.65}.report-card .actions{margin-top:auto}.report-card .btn-secondary{background:rgba(255,255,255,.62);border-color:rgba(148,163,184,.32);backdrop-filter:blur(6px)}.report-card .badge{background:rgba(255,255,255,.62);border-color:rgba(148,163,184,.30);color:rgba(15,23,42,.78)}.report-kpis .stat strong{font-size:24px}
+.settings{display:grid;grid-template-columns:1fr;gap:18px}.pane{background:var(--soft);border:1px solid var(--border);border-radius:22px;padding:18px;display:grid;gap:16px}.toggleRow{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:14px 16px;border-radius:18px;background:var(--panel);border:1px solid var(--border)}.toggle{position:relative;width:54px;height:30px;border:none;border-radius:999px;background:#cbd5e1;cursor:pointer}.toggle:after{content:"";position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .18s ease}.toggle.active{background:var(--blue)}.toggle.active:after{transform:translateX(24px)}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+table{width:100%;border-collapse:collapse}th,td{padding:14px 12px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}th{color:var(--muted);font-size:11px;letter-spacing:.12em;text-transform:uppercase}tr:last-child td{border-bottom:none}.mono{font-family:'DM Mono',monospace}
+.overlay{position:fixed;inset:0;z-index:90;display:none;align-items:flex-start;justify-content:center;padding:18px;background:rgba(15,23,42,.4);overflow-y:auto}.overlay.open{display:flex}.modal{width:min(560px,100%);max-height:calc(100vh - 36px);overflow:auto;background:var(--panel);border:1px solid var(--border);border-radius:24px;padding:18px;box-shadow:var(--shadow);display:grid;gap:14px}.mhead{display:flex;justify-content:space-between;gap:14px}.mhead h3{font-size:22px;letter-spacing:-.04em;margin-bottom:4px}.mhead p{color:var(--muted);line-height:1.5}.close{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--soft);color:var(--muted);cursor:pointer}.preview{display:flex;gap:14px;align-items:center;padding:14px;border-radius:18px;border:1px solid var(--border);background:var(--soft)}.preview .icon{width:76px;height:76px;border-radius:20px;display:grid;place-items:center;font-size:42px;background:linear-gradient(145deg,rgba(37,99,235,.14),rgba(37,99,235,.03));border:1px solid rgba(37,99,235,.12)}.preview strong{display:block;font-size:20px;letter-spacing:-.04em}.actions{display:flex;gap:10px;flex-wrap:wrap}
+body.dark .auth-overlay{background:linear-gradient(135deg,#020617,#0f172a,#132238)}
+body.dark .auth-shell{background:rgba(15,23,42,.92);border-color:rgba(71,85,105,.5)}
+body.dark .sidebar{background:rgba(15,23,42,.78)}
+body.dark .top{background:rgba(15,23,42,.75)}
+body.dark .id{background:rgba(15,23,42,.7)}
+body.dark .sticky{background:#463d08;border-color:#756813;color:#fef9c3}
+body.dark .sticky .muted{color:#f5e7a5}
+body.dark .laptop-banner,body.dark .security-banner,body.dark .security-focus{border-color:rgba(96,165,250,.18)}
+  body.dark .reports-hero{background:radial-gradient(circle at top left,rgba(37,99,235,.26),transparent 48%),radial-gradient(circle at bottom right,rgba(34,197,94,.12),transparent 55%),linear-gradient(135deg,#0b1222,#0f1a34,#122040);border-color:rgba(96,165,250,.18)}
+  body.dark .reports-hero .eyebrow{color:rgba(191,219,254,.92)}
+body.dark .reports-hero p{color:rgba(226,232,240,.78)}
+body.dark .report-focus{background:linear-gradient(180deg,rgba(22,32,51,.88),rgba(22,32,51,.72));border-color:rgba(148,163,184,.22)}
+body.dark .report-card{border-color:rgba(148,163,184,.26);box-shadow:0 18px 34px rgba(2,8,23,.36),inset 0 1px 0 rgba(255,255,255,.06)}
+body.dark .report-card:before{background:radial-gradient(circle at 18% 18%,rgba(96,165,250,.18),transparent 55%),radial-gradient(circle at 85% 70%,rgba(34,197,94,.10),transparent 55%)}
+body.dark .report-card:after{background:radial-gradient(circle at 30% 35%,rgba(96,165,250,.18),transparent 60%)}
+body.dark .report-card.paper-sun{background:radial-gradient(circle at 22% 20%,rgba(245,158,11,.16),transparent 55%),linear-gradient(180deg,rgba(22,32,51,.96),rgba(22,32,51,.86))}
+body.dark .report-card.paper-peach{background:radial-gradient(circle at 22% 20%,rgba(244,63,94,.12),transparent 55%),linear-gradient(180deg,rgba(22,32,51,.96),rgba(22,32,51,.86))}
+body.dark .report-card.paper-mint{background:radial-gradient(circle at 22% 20%,rgba(34,197,94,.14),transparent 55%),linear-gradient(180deg,rgba(22,32,51,.96),rgba(22,32,51,.86))}
+body.dark .report-card.paper-sky{background:radial-gradient(circle at 22% 20%,rgba(96,165,250,.16),transparent 55%),linear-gradient(180deg,rgba(22,32,51,.96),rgba(22,32,51,.86))}
+body.dark .report-card .btn-secondary{background:rgba(15,23,42,.20);border-color:rgba(148,163,184,.22)}
+body.dark .report-card .badge{background:rgba(15,23,42,.22);border-color:rgba(148,163,184,.20);color:rgba(226,232,240,.86)}
+body.dark .report-card{border-color:rgba(255,244,205,.1);color:#fff8da;box-shadow:0 26px 40px rgba(0,0,0,.32),0 10px 18px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,249,216,.06)}
+body.dark .report-card.paper-sun{background:linear-gradient(180deg,#665108 0%,#856916 54%,#a17b17 100%)}
+body.dark .report-card.paper-peach{background:linear-gradient(180deg,#6f3d1f 0%,#8d542c 54%,#b56f3b 100%)}
+body.dark .report-card.paper-mint{background:linear-gradient(180deg,#224b2d 0%,#2f6640 54%,#3d8554 100%)}
+body.dark .report-card.paper-sky{background:linear-gradient(180deg,#1f4266 0%,#285680 54%,#3370a7 100%)}
+body.dark .report-card:before{background:linear-gradient(180deg,rgba(255,248,214,.08),transparent 24%,rgba(0,0,0,.08) 100%)}
+body.dark .report-card:after{background:linear-gradient(135deg,rgba(255,223,118,.12),rgba(0,0,0,0))}
+body.dark .report-card .muted{color:#f6e8ba}
+body.dark .report-card .clip{background:linear-gradient(180deg,rgba(244,222,154,.86),rgba(171,129,24,.85));border-color:rgba(255,244,205,.1)}
+body.dark .report-card .btn-secondary{background:rgba(255,248,214,.08);border-color:rgba(255,244,205,.12);color:#fff6cf}
+body.dark .report-card .badge{background:rgba(255,248,214,.1);border-color:rgba(255,244,205,.12);color:#fff2c2}
+@media (max-width:980px){.auth-shell,.settings{grid-template-columns:1fr}.sidebar{position:static;width:100%;border-right:none;border-bottom:1px solid var(--border)}.main{margin-left:0}}
+@media (max-width:760px){body{font-size:13px}.top,.content{padding:16px 14px}.top{flex-direction:column;align-items:flex-start}.top-right,.search{width:100%}.search{min-width:0}.two,.security-hero,.reports-top{grid-template-columns:1fr}.reports-band{flex-direction:column;align-items:flex-start}.auth-shell{grid-template-columns:1fr}.auth-hero,.auth-panel{padding:26px 22px}.modal{width:100%;max-height:calc(100vh - 24px);padding:16px}}
+</style>
+</head>
+<body>
+<div id="loginOv" class="auth-overlay" style="display:flex">
+  <div class="auth-shell">
+    <section class="auth-hero">
+      <div class="auth-brand"><div class="auth-mark">CS</div><span>Cyber Secure</span></div>
+      <div><h1>Ancrew Global</h1><p>Asset Management Dashboard</p></div>
+      <div class="auth-points">
+        <div class="auth-point"><br><strong>Manage Laptops</strong><br>
+        <div class="auth-point"><br><strong>Employees workspace</strong><br>
+        <div class="auth-point"><br><strong>Security Control </strong><br>
+      </div>
+    </section>
+    <section class="auth-panel">
+      <div class="auth-card">
+        <div class="kicker">Secure Sign In</div>
+        <h2>Welcome back</h2>
+        <p class="sub">Sign in</p>
+        <div class="stack">
+          <div><label class="label" for="login-username">Username</label><input id="login-username" class="input" type="text" placeholder="Enter username"></div>
+          <div><label class="label" for="login-password">Password</label><input id="login-password" class="input" type="password" placeholder="Enter password"></div>
+        </div>
+        <div class="auth-actions">
+          <button id="login-btn" class="btn btn-primary">Login</button>
+          <button id="register-link" class="btn btn-secondary">Create Account</button>
+        </div>
+        <div id="login-status" class="status"></div>
+        <div class="auth-note"> <strong></strong>Forgot Password<strong></strong></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="registerOv" class="auth-overlay">
+  <div class="auth-shell">
+    <section class="auth-hero">
+      <div class="auth-brand"><div class="auth-mark">AM</div><span>Asset Manager</span></div>
+      <div><h1>Create a workspace account in minutes.</h1><p>New users can sign in immediately and later be managed in Settings.</p></div>
+      <div class="auth-points">
+        <div class="auth-point"><strong>Fast onboarding</strong><br>Create an account without leaving the app.</div>
+        <div class="auth-point"><strong>Clean admin flow</strong><br>Admins can edit users, IDs, and roles later.</div>
+      </div>
+    </section>
+    <section class="auth-panel">
+      <div class="auth-card">
+        <div class="kicker">Create Account</div>
+        <h2>Set up access</h2>
+        <p class="sub">Create a new account for immediate dashboard access.</p>
+        <div class="stack">
+          <div><label class="label" for="reg-username">Username</label><input id="reg-username" class="input" type="text"></div>
+          <div><label class="label" for="reg-email">Email</label><input id="reg-email" class="input" type="email"></div>
+          <div><label class="label" for="reg-password">Password</label><input id="reg-password" class="input" type="password"></div>
+          <div><label class="label" for="reg-name">Full Name</label><input id="reg-name" class="input" type="text"></div>
+        </div>
+        <div class="auth-actions">
+          <button id="register-btn" class="btn btn-primary">Create Account</button>
+          <button id="back-to-login" class="btn btn-secondary">Back to Login</button>
+        </div>
+        <div id="register-status" class="status"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="appShell" class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-row"><div class="brand-icon">💻</div><span>Asset Management</span></div>
+      <p>Dashboard</p>
+    </div>
+    <div class="nav">
+      <b>Workspace</b>
+      <button class="active" data-tab="laptops"><span class="ico">💻</span><span>Laptops</span></button>
+      <button data-tab="security"><span class="ico">🛡️</span><span>Security</span></button>
+      <button data-tab="reports"><span class="ico">📊</span><span>Reports</span></button>
+      <button data-tab="settings"><span class="ico">⚙️</span><span>Settings</span></button>
+    </div>
+    <div class="side-note">Search is case-insensitive across the workspace.</div>
+  </aside>
+
+  <main class="main">
+    <header class="top">
+      <div class="copy"><h1 id="pageTitle">Laptops</h1><p id="pageSubtitle">Manage laptop inventory and hardware details.</p></div>
+      <div class="top-right">
+        <label class="search"><span>🔍</span><input id="searchInput" type="text" placeholder="Search laptops by ID, name, employee, or department"></label>
+        <div class="chip"><div id="topUserAvatar" class="avatar">AD</div><div><strong id="topUserName">Admin</strong><small id="topUserRole">Current user</small></div></div>
+        <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section id="tab-laptops" class="tab active">
+        <div class="laptop-shell">
+          <div class="card">
+            <div class="head"><div><h2>All Laptops</h2><p>Review assigned devices, hardware specs, and policy coverage.</p></div><div class="actions"><button class="btn btn-primary" onclick="openAssetModal()">Add new Laptop</button><button class="btn btn-secondary" onclick="exportAssetsCsv()">Export to CSV</button></div></div>
+            <div id="assetSummary" class="asset-summary-banner" style="margin-bottom:18px"></div>
+            <div class="filters-row">
+              <label class="label">Status
+                <select id="assetStatusFilter" class="select" onchange="setAssetStatusFilter(this.value)">
+                  <option value="all">All devices</option>
+                  <option value="assigned">Assigned</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </label>
+              <label class="label">Department
+                <select id="assetDeptFilter" class="select" onchange="setAssetFilter('dept',this.value)">
+                  <option value="all">All departments</option>
+                  <option value="Sales">Sales</option>
+                  <option value="Technical">Technical</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="Senior Management">Senior Management</option>
+                </select>
+              </label>
+              <label class="label">Bitdefender
+                <select id="assetBdFilter" class="select" onchange="setAssetFilter('bitdefender',this.value)">
+                  <option value="all">All statuses</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
+              </label>
+            </div>
+            <div id="assetExportStatus" class="status"></div>
+            <div id="assetsGrid" class="grid laptop-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-security" class="tab">
+        <div class="security-shell">
+          <div class="security-hero">
+            <div class="security-banner">
+              <div class="eyebrow">Security overview</div>
+              <h2>Activity pulse across the workspace</h2>
+              <p>Review login behavior, laptop changes, and the latest actions from one place without changing the underlying logs.</p>
+              <div id="securityBands" class="band"></div>
+            </div>
+            <div id="securityFocus" class="security-focus"></div>
+          </div>
+          <div class="card">
+            <div class="head"><div><h2>Security Logs</h2><p>Track login, logout, and laptop change activity.</p></div></div>
+            <div id="securityStats" class="stats security-kpis"></div>
+            <div class="security-toolbar" style="margin-top:16px">
+              <div class="filters" id="securityFilters"></div>
+              <div class="theme-state" id="securityResultsInfo"></div>
+            </div>
+            <div id="securityGrid" class="grid security-list" style="margin-top:16px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-reports" class="tab">
+        <div class="reports-shell">
+          <div class="reports-top">
+            <div class="reports-hero">
+              <div>
+                <div class="eyebrow">Reports workspace</div>
+                <h2>Keep quick notes visible and actionable</h2>
+                <p>Review active notes, spot recent updates, and export the current report board when needed.</p>
+                <div id="reportsBands" class="reports-band"></div>
+              </div>
+            </div>
+            <div id="reportFocus" class="report-focus"></div>
+          </div>
+          <div class="card">
+            <div class="head"><div><h2>Report Notes</h2><p>Edit notes and add new ones.</p></div><div class="actions"><button class="btn btn-secondary" onclick="exportReportsCsv()">Export CSV</button><button class="btn btn-primary" onclick="openReportModal()">New Note</button></div></div>
+            <div id="reportsStats" class="stats report-kpis"></div>
+            <div id="reportExportStatus" class="status" style="margin-top:14px"></div>
+            <div id="reportsGrid" class="grid report-grid" style="margin-top:16px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-settings" class="tab">
+        <div class="card">
+          <div class="head"><div><h2>Settings</h2><p>Appearance controls for the workspace.</p></div></div>
+          <div class="settings">
+            <div class="pane">
+              <div><h3 style="margin-bottom:6px">Appearance</h3><p class="muted">Switch the workspace theme instantly.</p></div>
+              <div class="toggleRow"><div><strong>Dark Mode</strong><div class="muted" style="margin-top:4px">Stored in this browser for future visits.</div></div><button id="darkModeToggle" class="toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false"></button></div>
+              <div class="theme-line"><span class="theme-state">Theme status</span><strong id="themeStatusLabel">Light mode active</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<div id="assetModal" class="overlay" onclick="backdrop(event,'assetModal')"><div class="modal"><div class="mhead"><div><h3 id="assetModalTitle">Add Laptop</h3><p>Create or edit a PC record with hardware and policy details.</p></div><button class="close" onclick="closeModal('assetModal')">✕</button></div><div class="preview"><div class="icon">💻</div><div><strong id="assetPreviewName">PC Preview</strong><span id="assetPreviewId" class="muted mono">AGS0001</span></div></div><div class="stack"><div class="two"><div><label class="label" for="asset-name">Laptop Name</label><input id="asset-name" class="input" type="text"></div><div><label class="label" for="asset-id">Asset ID</label><input id="asset-id" class="input mono" type="text" placeholder="Auto-filled, or type 6 / AGS0006"><div class="muted" style="margin-top:6px;font-size:12px">Leave blank for the next number, or enter your own ID.</div></div></div><div class="two"><div><label class="label" for="asset-system-model">System Model</label><input id="asset-system-model" class="input" type="text"></div><div><label class="label" for="asset-generation">Gen</label><input id="asset-generation" class="input" type="text" placeholder="e.g. 11th Gen"></div></div><div class="two"><div><label class="label" for="asset-user">Employee Name</label><input id="asset-user" class="input" type="text"></div><div><label class="label" for="asset-employee-id">Employee ID</label><input id="asset-employee-id" class="input" type="text"></div></div><div class="two"><div><label class="label" for="asset-dept">Department</label><select id="asset-dept" class="select"><option value="">Select department</option><option value="Sales">Sales</option><option value="Technical">Technical</option><option value="Marketing">Marketing</option><option value="Senior Management">Senior Management</option></select></div><div><label class="label" for="asset-location">Location</label><input id="asset-location" class="input" type="text" placeholder="Office location"></div></div><div class="two"><div><label class="label" for="asset-serial-number">Serial Number</label><input id="asset-serial-number" class="input" type="text"></div><div><label class="label" for="asset-ram">RAM</label><select id="asset-ram" class="select"><option value="">Select RAM</option><option value="8">8GB</option><option value="12">12GB</option><option value="16">16GB</option><option value="24">24GB</option></select></div></div><div class="two"><div><label class="label" for="asset-rom">ROM</label><select id="asset-rom" class="select"><option value="">Select ROM</option><option value="256">256 GB</option><option value="512">512 GB</option><option value="1024">1 TB</option></select></div><div><label class="label" for="asset-bitdefender">Bitdefender Installed</label><select id="asset-bitdefender" class="select"><option value="Yes">Yes</option><option value="No">No</option></select></div></div><div class="two"><div><label class="label" for="asset-policy-name">Policy Name</label><input id="asset-policy-name" class="input" type="text"></div><div><label class="label" for="asset-notes">Notes</label><textarea id="asset-notes" class="textarea"></textarea></div></div></div><div id="assetFormStatus" class="status"></div><div class="actions"><button id="assetDeleteBtn" class="btn btn-danger hidden" onclick="deleteAsset()">Delete</button><button class="btn btn-secondary" onclick="closeModal('assetModal')">Cancel</button><button class="btn btn-primary" onclick="saveAsset()">Save Laptop</button></div></div></div>
+<div id="securityModal" class="overlay" onclick="backdrop(event,'securityModal')"><div class="modal"><div class="mhead"><div><h3 id="securityModalTitle">New Security Item</h3><p>Create or edit a security entry.</p></div><button class="close" onclick="closeModal('securityModal')">✕</button></div><div class="stack"><div class="two"><div><label class="label" for="security-title">Title</label><input id="security-title" class="input" type="text"></div><div><label class="label" for="security-owner">Owner</label><input id="security-owner" class="input" type="text"></div></div><div><label class="label" for="security-status">Status</label><select id="security-status" class="select"><option>Open</option><option>In Progress</option><option>Resolved</option></select></div><div><label class="label" for="security-details">Details</label><textarea id="security-details" class="textarea"></textarea></div></div><div id="securityFormStatus" class="status"></div><div class="actions"><button id="securityDeleteBtn" class="btn btn-danger hidden" onclick="deleteSecurity()">Delete</button><button class="btn btn-secondary" onclick="closeModal('securityModal')">Cancel</button><button class="btn btn-primary" onclick="saveSecurity()">Save Item</button></div></div></div>
+<div id="reportModal" class="overlay" onclick="backdrop(event,'reportModal')"><div class="modal"><div class="mhead"><div><h3 id="reportModalTitle">New Note</h3><p>Create or edit a report note.</p></div><button class="close" onclick="closeModal('reportModal')">✕</button></div><div class="stack"><div><label class="label" for="report-title">Title</label><input id="report-title" class="input" type="text"></div><div><label class="label" for="report-content">Content</label><textarea id="report-content" class="textarea"></textarea></div></div><div id="reportFormStatus" class="status"></div><div class="actions"><button id="reportDeleteBtn" class="btn btn-danger hidden" onclick="deleteReport()">Delete</button><button class="btn btn-secondary" onclick="closeModal('reportModal')">Cancel</button><button class="btn btn-primary" onclick="saveReport()">Save Note</button></div></div></div>
+<div id="userModal" class="overlay" onclick="backdrop(event,'userModal')"><div class="modal"><div class="mhead"><div><h3>Edit Employee</h3><p>Update employee details and optionally reset login password to the ID value.</p></div><button class="close" onclick="closeModal('userModal')">✕</button></div><div class="stack"><div class="two"><div><label class="label" for="edit-user-username">Username</label><input id="edit-user-username" class="input" type="text"></div><div><label class="label" for="edit-user-id">Employee ID</label><input id="edit-user-id" class="input" type="text"></div></div><div class="two"><div><label class="label" for="edit-user-name">Full Name</label><input id="edit-user-name" class="input" type="text"></div><div><label class="label" for="edit-user-email">Email</label><input id="edit-user-email" class="input" type="email"></div></div><div class="two"><div><label class="label" for="edit-user-number">Number</label><input id="edit-user-number" class="input" type="text"></div><div><label class="label" for="edit-user-role">Role</label><select id="edit-user-role" class="select"><option value="employee">Employee</option><option value="admin">Admin</option></select></div></div><label style="display:flex;gap:10px;align-items:flex-start;color:var(--muted)"><input id="reset-user-password" type="checkbox" style="margin-top:4px"><span>Reset login password to the current ID value.</span></label></div><div id="userEditStatus" class="status"></div><div class="actions"><button id="userDeleteBtn" class="btn btn-danger" onclick="deleteUser()">Delete User</button><button class="btn btn-secondary" onclick="closeModal('userModal')">Cancel</button><button class="btn btn-primary" onclick="saveUser()">Save User</button></div></div></div>
+<script>
+const API=window.location.origin.startsWith('http')?window.location.origin:'http://localhost:5000';
+const state={assets:[],security:[],reports:[],users:[],currentUser:null,tab:'laptops',editAsset:null,editSecurity:null,editReport:null,editUser:null,securityFilter:'all',assetStatus:'all',assetFilters:{dept:'all',bitdefender:'all'}};
+const tabs={laptops:['Laptops','Manage laptop inventory and hardware details.','Search any word across laptops, security, reports, and settings'],security:['Security','View login, logout, and laptop change logs.','Search any word across security logs'],reports:['Reports','Track report notes in sticky-note view.','Search any word across report notes'],settings:['Settings','Manage workspace appearance.','Search any word across settings']};
+const $=id=>document.getElementById(id);
+const low=v=>String(v||'').toLowerCase();
+const esc=v=>String(v||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#39;");
+const initials=n=>(n||'User').split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+function setStatus(id,msg='',ok=false){const e=$(id);e.textContent=msg;e.classList.toggle('ok',ok)}
+function closeModal(id){$(id).classList.remove('open')}
+function backdrop(e,id){if(e.target.id===id)closeModal(id)}
+function applyTheme(t){const theme=t==='dark'?'dark':'light';const isDark=theme==='dark';document.body.classList.toggle('dark',isDark);document.documentElement.setAttribute('data-theme',theme);$('darkModeToggle').classList.toggle('active',isDark);$('darkModeToggle').setAttribute('aria-pressed',String(isDark));$('themeStatusLabel').textContent=isDark?'Dark mode active':'Light mode active';localStorage.setItem('asset-theme',theme)}
+function formatDate(v){if(!v)return'Not available';const d=new Date(v);return Number.isNaN(d.getTime())?v:d.toLocaleString()}
+function showLogin(){$('registerOv').style.display='none';$('loginOv').style.display='flex';$('appShell').style.display='none'}
+function showApp(){$('loginOv').style.display='none';$('registerOv').style.display='none';$('appShell').style.display='flex'}
+function header(){const m=tabs[state.tab];$('pageTitle').textContent=m[0];$('pageSubtitle').textContent=m[1];$('searchInput').placeholder=m[2]}
+function setTopUser(){const user=state.currentUser;const name=user?.name||user?.username||'Admin';const roleString=String(user?.role||'employee').toLowerCase();const role=roleString==='admin'?'Admin':'Employee';$('topUserName').textContent=name;$('topUserAvatar').textContent=initials(name);$('topUserRole').textContent=role;document.querySelectorAll('.admin-only').forEach(el=>el.style.display=role==='Admin'?'inline-flex':'none')}
+function switchTab(tab){state.tab=tab;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.id===`tab-${tab}`));header();render()}
+function query(){return low($('searchInput').value.trim())}
+function csvCell(v){return`"${String(v??'').replaceAll('"','""')}"`}
+function nextAssetId(){const ns=new Set(state.assets.map(a=>a.id||'').filter(id=>/^AGS\d+$/.test(id)).map(id=>+id.slice(3)));let n=1;while(ns.has(n))n+=1;return`AGS${String(n).padStart(4,'0')}`}
+function assetEmployeeName(a){return a.user||'Unassigned'}
+function assetLaptopName(a){return a.name||`PC ${a.id}`}
+function searchWords(){return query().split(/\s+/).filter(Boolean)}
+function matchesAllWords(text, words){const haystack=low(text);return words.every(word=>haystack.includes(word))}
+function filteredAssets(){const words=searchWords();return state.assets.filter(a=>{if(state.assetStatus==='pending'&&!a.user)return true;if(state.assetStatus==='assigned'&&a.user)return true;if(state.assetStatus==='all')return true;return false}).filter(a=>{if(state.assetFilters.dept!=='all'&&low(a.dept)!==low(state.assetFilters.dept))return false;if(state.assetFilters.bitdefender!=='all'&&low((a.bitdefender_installed||'no'))!==low(state.assetFilters.bitdefender))return false;return true}).filter(a=>!words.length||matchesAllWords([a.id,a.name,a.system_model,a.generation,a.user,a.employee_id,a.dept,a.location,a.ram,a.rom,a.serial_number,a.bitdefender_installed,a.policy_name,a.notes].join(' '),words))}
+function renderAssetSummary(){const total=state.assets.length;const assigned=state.assets.filter(a=>Boolean(a.user)).length;const pending=state.assets.filter(a=>!a.user).length;const bdInstalled=state.assets.filter(a=>low(a.bitdefender_installed)==='yes').length;$('assetSummary').innerHTML=`<div><div class="eyebrow">Laptops overview</div><h3>${total} devices tracked</h3><p class="muted">Total PCs, Assigned PCs, Pending PCs, and Bitdefender coverage in one line.</p></div><div class="summary-pill-group"><span class="pill total-pill">Total PCs: ${total}</span><span class="pill assigned-pill">Assigned PCs: ${assigned}</span><span class="pill pending-pill">Pending PCs: ${pending}</span><span class="pill bd-pill">Bitdefender installed: ${bdInstalled}</span></div>`}
+function setAssetStatusFilter(status){state.assetStatus=status||'all';const select=$('assetStatusFilter');if(select)select.value=state.assetStatus;renderAssets()}
+function setAssetFilter(field,value){if(!['dept','bitdefender'].includes(field))return;state.assetFilters[field]=value||'all';const select=$(field==='dept'?'assetDeptFilter':'assetBdFilter');if(select)select.value=state.assetFilters[field];renderAssets()}
+function renderAssets(){renderAssetSummary();const rows=filteredAssets();$('assetsGrid').innerHTML=rows.length?rows.map(a=>`<article class="asset asset-card"><div class="asset-body"><div class="pc-wrap"><div class="pc">💻</div><div class="id">${esc(a.id)}</div></div><div class="asset-meta"><div><h3 class="title">${esc(assetEmployeeName(a))}</h3><span class="sub-title">${esc(assetLaptopName(a))}</span><p class="muted">${a.employee_id?`${esc(a.employee_id)} • `:''}${esc(a.system_model||'System Model not set')}</p></div><span class="badge ${a.user?'green':'yellow'}">${a.user?'Assigned':'Pending'}</span></div><div class="stack"><div class="row"><span class="muted">System Model</span><strong>${esc(a.system_model||'Not set')}</strong></div><div class="row"><span class="muted">Gen</span><strong>${esc(a.generation||'Not set')}</strong></div><div class="row"><span class="muted">Department</span><strong>${esc(a.dept||'Not set')}</strong></div><div class="row"><span class="muted">Location</span><strong>${esc(a.location||'Not set')}</strong></div><div class="row"><span class="muted">RAM</span><strong>${esc(a.ram||'Not set')}</strong></div><div class="row"><span class="muted">ROM</span><strong>${esc(a.rom||'Not set')}</strong></div><div class="row"><span class="muted">Serial Number</span><strong>${esc(a.serial_number||'Not set')}</strong></div><div class="row"><span class="muted">Bitdefender</span><strong>${esc(a.bitdefender_installed||'No')}</strong></div><div class="row"><span class="muted">Policy</span><strong>${esc(a.policy_name||'Not set')}</strong></div></div><div class="actions"><button class="btn btn-secondary" onclick="openAssetModal('${a.id}')">Edit Laptop</button></div></div></article>`).join(''):`<div class="empty">No laptops match the current search.</div>`}
+function securityCategory(item){const s=low([item?.title,item?.details].join(' '));if(s.includes('login'))return'login';if(s.includes('logout'))return'logout';if(s.includes('update')||s.includes('created')||s.includes('deleted')||s.includes('laptop'))return'device';return'general'}
+function securityLabel(type){if(type==='login')return'Login';if(type==='logout')return'Logout';if(type==='device')return'Device Change';return'General'}
+function securityBadgeClass(value){const kind=typeof value==='string'?value:securityCategory(value);if(kind==='login')return'green';if(kind==='logout')return'yellow';if(kind==='device')return'blue';return'neutral'}
+function filteredSecurity(){const words=searchWords();return state.security.filter(i=>{const matchesQuery=!words.length||matchesAllWords([i.title,i.actor,i.asset_id,i.details].join(' '),words);const matchesFilter=state.securityFilter==='all'||securityCategory(i)===state.securityFilter;return matchesQuery&&matchesFilter})}
+function renderSecurityFilters(rows){const defs=[['all','All activity'],['login','Login'],['logout','Logout'],['device','Device changes'],['general','General']];$('securityFilters').innerHTML=defs.map(([value,label])=>`<button class="filter-chip ${state.securityFilter===value?'active':''}" type="button" onclick="setSecurityFilter('${value}')">${label}</button>`).join('');$('securityResultsInfo').textContent=`Showing ${rows.length} ${rows.length===1?'event':'events'}`}
+function renderSecuritySummary(){const total=state.security.length,logins=state.security.filter(i=>securityCategory(i)==='login').length,logouts=state.security.filter(i=>securityCategory(i)==='logout').length,device=state.security.filter(i=>securityCategory(i)==='device').length,latest=state.security[0];$('securityStats').innerHTML=`<div class="stat"><span>Total Events</span><strong>${total}</strong></div><div class="stat"><span>Logins</span><strong>${logins}</strong></div><div class="stat"><span>Logouts</span><strong>${logouts}</strong></div><div class="stat"><span>Device Changes</span><strong>${device}</strong></div>`;$('securityBands').innerHTML=`<span class="mini-pill">${total} logged events</span><span class="mini-pill">${logins} sign-ins detected</span><span class="mini-pill">${device} laptop actions tracked</span>`;$('securityFocus').innerHTML=latest?`<div class="eyebrow">Latest event</div><strong>${esc(latest.title||'Activity')}</strong><p>${esc(latest.details||'No details available.')}</p><div class="stamp">${esc(latest.actor||'System')}${latest.asset_id?` • ${esc(latest.asset_id)}`:''}</div><div class="muted-lite">${formatDate(latest.updated_at)}</div>`:`<div class="eyebrow">Latest event</div><strong>No activity yet</strong><p>No security entries are available right now.</p>`}
+function renderSecurity(){const rows=filteredSecurity();renderSecuritySummary();renderSecurityFilters(rows);$('securityGrid').innerHTML=rows.length?rows.map(i=>`<article class="security security-card"><div class="security-body"><div class="security-meta"><div><h3 class="title">${esc(i.title||'Activity')}</h3><p class="muted">${esc(i.actor||'System')}</p></div><span class="badge ${securityBadgeClass(i)}">${esc(i.asset_id||securityLabel(securityCategory(i)))}</span></div><p class="security-detail">${esc(i.details||'No details available.')}</p><div class="security-footer"><span class="mini-pill">${esc(securityLabel(securityCategory(i)))}</span><strong>${formatDate(i.updated_at)}</strong></div></div></article>`).join(''):`<div class="empty">No security logs match the current search or filter.</div>`}
+function setSecurityFilter(filter){state.securityFilter=filter;renderSecurity()}
+function filteredReports(){const words=searchWords();return state.reports.filter(i=>!words.length||matchesAllWords([i.title,i.content].join(' '),words))}
+function reportPreview(text){const value=(text||'').trim();if(!value)return'No note content yet.';return value.length>140?`${value.slice(0,140)}...`:value}
+function reportPaperClass(index){return['paper-sun','paper-peach','paper-mint','paper-sky'][index%4]}
+function renderReports(){const rows=filteredReports(),total=state.reports.length,withContent=state.reports.filter(i=>(i.content||'').trim()).length,latest=state.reports[0],lastDate=latest?.updated_at?new Date(latest.updated_at):null;$('reportsStats').innerHTML=`<div class="stat"><span>Total Notes</span><strong>${total}</strong></div><div class="stat"><span>With Details</span><strong>${withContent}</strong></div><div class="stat"><span>Matching Search</span><strong>${rows.length}</strong></div><div class="stat"><span>Last Updated</span><strong>${lastDate&&!Number.isNaN(lastDate.getTime())?lastDate.toLocaleDateString():'-'}</strong></div>`;$('reportsBands').innerHTML=`<span class="mini-pill">${total} notes on the board</span><span class="mini-pill">${withContent} notes with written details</span><span class="mini-pill">${rows.length} currently visible</span>`;$('reportFocus').innerHTML=latest?`<div class="eyebrow">Latest note</div><strong>${esc(latest.title||'Untitled note')}</strong><p class="muted">${esc(reportPreview(latest.content))}</p><div class="stamp">Updated ${formatDate(latest.updated_at)}</div>`:`<div class="eyebrow">Latest note</div><strong>No notes yet</strong><p class="muted">Create a note to start building the report board.</p>`;$('reportsGrid').innerHTML=rows.length?rows.map((i,index)=>`<article class="note report-card ${reportPaperClass(index)}"><div class="clip"></div><div class="pin"></div><div class="note-body"><div class="row"><div><h3 class="title">${esc(i.title)}</h3><p class="muted">Last updated ${formatDate(i.updated_at)}</p></div><span class="badge neutral">Note</span></div><p class="muted note-copy">${esc(reportPreview(i.content))}</p><div class="actions"><button class="btn btn-secondary" onclick="openReportModal('${i.id}')">Edit Note</button></div></div></article>`).join(''):`<div class="empty">No notes match the current search.</div>`}
+function render(){if(state.tab==='laptops')renderAssets();if(state.tab==='security')renderSecurity();if(state.tab==='reports')renderReports();if(state.tab==='settings'){}}
+function updatePreview(){const employee=$('asset-user').value.trim()||'Employee Name';const laptop=$('asset-name').value.trim()||'Laptop Name';$('assetPreviewName').textContent=employee;$('assetPreviewId').textContent=`${$('asset-id').value||'AGS0001'} • ${laptop}`}
+function openAssetModal(id=null){state.editAsset=id;setStatus('assetFormStatus','');const a=state.assets.find(x=>x.id===id);$('assetModalTitle').textContent=a?'Edit Laptop':'Add Laptop';$('assetDeleteBtn').classList.toggle('hidden',!a);$('asset-id').value=a?.id||nextAssetId();$('asset-name').value=a?.name||'';$('asset-system-model').value=a?.system_model||'';$('asset-generation').value=a?.generation||'';$('asset-user').value=a?.user||'';$('asset-employee-id').value=a?.employee_id||'';$('asset-dept').value=a?.dept||'';$('asset-location').value=a?.location||'';$('asset-serial-number').value=a?.serial_number||'';$('asset-ram').value=a?.ram||'';$('asset-rom').value=a?.rom||'';$('asset-bitdefender').value=a?.bitdefender_installed||'No';$('asset-policy-name').value=a?.policy_name||'';$('asset-notes').value=a?.notes||'';updatePreview();$('assetModal').classList.add('open')}
+function openSecurityModal(id=null){state.editSecurity=id;setStatus('securityFormStatus','');const i=state.security.find(x=>x.id===id);$('securityModalTitle').textContent=i?'Edit Security Item':'New Security Item';$('securityDeleteBtn').classList.toggle('hidden',!i);$('security-title').value=i?.title||'';$('security-owner').value=i?.owner||'';$('security-status').value=i?.status||'Open';$('security-details').value=i?.details||'';$('securityModal').classList.add('open')}
+function openReportModal(id=null){state.editReport=id;setStatus('reportFormStatus','');const i=state.reports.find(x=>x.id===id);$('reportModalTitle').textContent=i?'Edit Note':'New Note';$('reportDeleteBtn').classList.toggle('hidden',!i);$('report-title').value=i?.title||'';$('report-content').value=i?.content||'';$('reportModal').classList.add('open')}
+function openUserModal(id){state.editUser=id;setStatus('userEditStatus','');const u=state.users.find(x=>x.id===id);if(!u)return;$('edit-user-username').value=u.username||'';$('edit-user-id').value=u.employee_id||'';$('edit-user-name').value=u.name||'';$('edit-user-email').value=u.email||'';$('edit-user-number').value=u.number||'';$('edit-user-role').value=u.role||'employee';$('reset-user-password').checked=false;$('userDeleteBtn').disabled=u.id===state.currentUser?.id;$('userDeleteBtn').title=u.id===state.currentUser?.id?'You cannot delete your own account.':'';$('userModal').classList.add('open')}
+async function req(path,opt={}){const r=await fetch(`${API}${path}`,{credentials:'include',headers:{'Content-Type':'application/json',...(opt.headers||{})},...opt});if(r.status===204)return null;const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Request failed');return d}
+async function loadAll(){try{const [assets,security,reports]=await Promise.all([req('/assets',{method:'GET'}),req('/security',{method:'GET'}),req('/reports',{method:'GET'})]);state.assets=assets||[];state.security=security||[];state.reports=reports||[];state.users=String(state.currentUser?.role||'').toLowerCase()==='admin'?await req('/users',{method:'GET'}):[state.currentUser];render()}catch(e){console.error(e);if(/Authentication required|Not authenticated/i.test(e.message))showLogin()}}
+async function checkAuth(){try{state.currentUser=await req('/auth/me',{method:'GET'});setTopUser();showApp();await loadAll()}catch{showLogin()}}
+async function login(){const username=$('login-username').value.trim(),password=$('login-password').value;if(!username||!password){setStatus('login-status','Enter both username and password.');return}try{const d=await req('/auth/login',{method:'POST',body:JSON.stringify({username,password})});state.currentUser=d.user;setStatus('login-status','');setTopUser();showApp();await loadAll()}catch(e){setStatus('login-status',e.message)}}
+async function register(){const username=$('reg-username').value.trim(),email=$('reg-email').value.trim(),password=$('reg-password').value,name=$('reg-name').value.trim();if(!username||!email||!password||!name){setStatus('register-status','Complete all registration fields.');return}try{const d=await req('/auth/register',{method:'POST',body:JSON.stringify({username,email,password,name})});state.currentUser=d.user;setTopUser();showApp();await loadAll()}catch(e){setStatus('register-status',e.message)}}
+async function logout(){try{await req('/auth/logout',{method:'POST'})}catch(e){console.error(e)}state.currentUser=null;showLogin()}
+function exportAssetsCsv(){const rows=state.assets; if(!rows.length){setStatus('assetExportStatus','No laptops available to export.');return}const header=['Asset ID','Laptop Name','System Model','Gen','Employee Name','Employee ID','Department','Location','RAM','ROM','Serial Number','Bitdefender Installed','Policy Name','Notes','Updated At'];const csv=[header.map(csvCell).join(','),...rows.map(a=>[a.id||'',a.name||'',a.system_model||'',a.generation||'',a.user||'',a.employee_id||'',a.dept||'',a.location||'',a.ram||'',a.rom||'',a.serial_number||'',a.bitdefender_installed||'',a.policy_name||'',a.notes||'',a.updated_at||''].map(csvCell).join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`laptops-${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);setStatus('assetExportStatus',`Exported ${rows.length} laptop${rows.length===1?'':'s'}.`,true)}
+async function saveAsset(){const p={id:$('asset-id').value.trim(),name:$('asset-name').value.trim(),system_model:$('asset-system-model').value.trim(),generation:$('asset-generation').value.trim(),user:$('asset-user').value.trim(),employee_id:$('asset-employee-id').value.trim(),dept:$('asset-dept').value.trim(),location:$('asset-location').value.trim(),serial_number:$('asset-serial-number').value.trim(),ram:$('asset-ram').value.trim(),rom:$('asset-rom').value.trim(),bitdefender_installed:$('asset-bitdefender').value,policy_name:$('asset-policy-name').value.trim(),notes:$('asset-notes').value.trim()};if(!p.name){setStatus('assetFormStatus','Laptop name is required.');return}try{if(state.editAsset)await req(`/assets/${state.editAsset}`,{method:'PUT',body:JSON.stringify(p)});else await req('/assets',{method:'POST',body:JSON.stringify(p)});closeModal('assetModal');await loadAll()}catch(e){setStatus('assetFormStatus',e.message)}}
+async function deleteAsset(){if(!state.editAsset)return;try{await req(`/assets/${state.editAsset}`,{method:'DELETE'});closeModal('assetModal');await loadAll()}catch(e){setStatus('assetFormStatus',e.message)}}
+async function saveSecurity(){const p={title:$('security-title').value.trim(),owner:$('security-owner').value.trim(),status:$('security-status').value,details:$('security-details').value.trim()};if(!p.title){setStatus('securityFormStatus','Security title is required.');return}try{if(state.editSecurity)await req(`/security/${state.editSecurity}`,{method:'PUT',body:JSON.stringify(p)});else await req('/security',{method:'POST',body:JSON.stringify(p)});closeModal('securityModal');await loadAll()}catch(e){setStatus('securityFormStatus',e.message)}}
+async function deleteSecurity(){if(!state.editSecurity)return;try{await req(`/security/${state.editSecurity}`,{method:'DELETE'});closeModal('securityModal');await loadAll()}catch(e){setStatus('securityFormStatus',e.message)}}
+function exportReportsCsv(){const rows=filteredReports();if(!rows.length){setStatus('reportExportStatus','No report notes available to export.');return}const header=['ID','Title','Content','Updated At'];const csv=[header.map(csvCell).join(','),...rows.map(i=>[i.id||'',i.title||'',i.content||'',i.updated_at||''].map(csvCell).join(','))].join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`reports-${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);setStatus('reportExportStatus',`Exported ${rows.length} report note${rows.length===1?'':'s'}.`,true)}
+async function saveReport(){const p={title:$('report-title').value.trim(),content:$('report-content').value.trim()};if(!p.title){setStatus('reportFormStatus','Note title is required.');return}try{if(state.editReport)await req(`/reports/${state.editReport}`,{method:'PUT',body:JSON.stringify(p)});else await req('/reports',{method:'POST',body:JSON.stringify(p)});closeModal('reportModal');await loadAll()}catch(e){setStatus('reportFormStatus',e.message)}}
+async function deleteReport(){if(!state.editReport)return;try{await req(`/reports/${state.editReport}`,{method:'DELETE'});closeModal('reportModal');await loadAll()}catch(e){setStatus('reportFormStatus',e.message)}}
+$('login-btn').addEventListener('click',login);$('register-btn').addEventListener('click',register);$('logoutBtn').addEventListener('click',logout);$('register-link').addEventListener('click',()=>{$('loginOv').style.display='none';$('registerOv').style.display='flex';setStatus('login-status','')});$('back-to-login').addEventListener('click',()=>{$('registerOv').style.display='none';$('loginOv').style.display='flex';setStatus('register-status','')});$('searchInput').addEventListener('input',render);['asset-name','asset-user','asset-id'].forEach(id=>$(id).addEventListener('input',updatePreview));$('darkModeToggle').addEventListener('click',()=>applyTheme(document.body.classList.contains('dark')?'light':'dark'));document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));['login-password','reg-name'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key!=='Enter')return;if(id==='login-password')login();else register()}));
+window.addEventListener('load',()=>{applyTheme(localStorage.getItem('asset-theme')||'light');header();checkAuth()});
+</script>
+</body>
+</html>
+

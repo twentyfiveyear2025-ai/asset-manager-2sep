@@ -1,0 +1,24 @@
+[
+  {
+    "id": "0cc1e6bc-067d-4b13-8d66-50295c4d5288",
+    "username": "admin",
+    "password": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "email": "admin@company.com",
+    "role": "admin",
+    "name": "System Administrator",
+    "created_at": "2026-04-05T12:01:38.245851",
+    "last_login": "2026-09-02T17:00:46.578282"
+  },
+  {
+    "id": "5b39acae-63f9-4bbb-91ad-cae60d9552e3",
+    "username": "r-mane",
+    "password": "0ba06b5238ee70f9fde12f16e093b29491794d9381048549bfb351015f82ac6e",
+    "email": "r.mane@ancrewglobal.com",
+    "role": "employee",
+    "name": "Ritesh Mane",
+    "employee_id": "ags041",
+    "number": "9112607428",
+    "created_at": "2026-04-06T15:01:09.157681",
+    "last_login": null
+  }
+]
